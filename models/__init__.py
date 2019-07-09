@@ -1,0 +1,6 @@
+
+from .GCN_APPRO import GCN_APPRO
+from .DENSE_GCN_APPR import DENSE_GCN_APPR
+from .MLP import MLP
+from .MLP_GCN_HIGHWAY_MIX import MLP_GCN_HIGHWAY_MIX
+from .MLP_GCN_HIGHWAY_MIX_v2 import MLP_GCN_HIGHWAY_MIX_v2
