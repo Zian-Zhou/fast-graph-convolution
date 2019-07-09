@@ -2,9 +2,6 @@
 
 * ICLR2018 paper: ["FastGCN: Fast Learning with Graph Convolutional Networks via Importance Sampling"](https://openreview.net/forum?id=rytstxWAW&noteId=ByU9EpGSf)
 
-[toc]
-
-
 * 根据[github开源源码](https://github.com/matenure/FastGCN.git)实现
 
 ## 代码环境
