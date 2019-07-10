@@ -2,9 +2,6 @@
 
 * ICLR2018 paper: ["FastGCN: Fast Learning with Graph Convolutional Networks via Importance Sampling"](https://openreview.net/forum?id=rytstxWAW&noteId=ByU9EpGSf)
 
-[toc]
-
-
 * 根据[github开源源码](https://github.com/matenure/FastGCN.git)实现
 
 ## 代码环境
@@ -118,3 +115,57 @@ python finetune.py finetune --dataset_model_id=cora_dense_gcn_appr_h64 --lr_deca
 待完成  
 
 
+## 改进模型
+
+### 【dense+GCN】
+
+* 1、全连接加单层GCN  
+
+* 2、  
+在Pubmed数据集上表现相比于双层GCN或者仅用全连接（MLP）效果都有所提升；  
+在Cora数据集上表现不如双层GCN模型，但相比较MLP而言效果却有所提升。  
+
+综合上面提到了所有模型的表现，猜测在Pubmed数据集上，全连接效果比GCN好；在Cora数据集上GCN比MLP好。实验也验证了这个猜测。
+
+```
+python main.py main --model=mlp --ID=compare --dataset=pubmed
+python main.py main --model=dense_gcn_appr --ID=compare --dataset=pubmed
+python main.py main --model=gcn_appr --ID=compare --dataset=pubmed
+
+python main.py main --model=mlp --ID=compare --dataset=cora
+python main.py main --model=dense_gcn_appr --ID=compare --dataset=cora
+python main.py main --model=gcn_appr --ID=compare --dataset=cora
+```
+
+* 可能的原因：
+
+```
+可能是这两个数据集不同的特点所造成的——cora的节点特征维度大，但是特别稀疏，仅仅用自身的特征不足以判断类别，因此引入了周围节点信息的GCN模型效果会比仅仅利用自身信息的MLP模型效果好；而pubmed的节点特征维度不大，可能比较稠密，并且自身的特征足以判断类别，因此引入周围节点信息的GCN模型也带来了不必要的噪声，导致效果还不如MLP。
+```
+
+### 【mlp_gcn_highway_mix】
+
+* 1、两个分支：  
+mlp分支+GCN分支，主要区别就在于是否引入拓扑信息  
+
+* 2、highway：  
+两个分支通过一个门控函数做加权和，门控函数的设计同HighwayNetwork（或者说同GRU、LSTM）。  
+
+* 3、设计动机：  
+希望网络可以学习根据节点的特征判断是否引入周围节点的信息。做两个分支的目的也是在于显式的区分是否引入拓扑信息。  
+
+* 4、效果：
+Pubmed数据集：模型效果比较dense+GCN、双层GCN以及MLP都有所提升；  
+Cora数据集：模型效果比较mlp有所提升，但是远不如dense+gcn、双层GCN。
+
+```
+python main.py main --model=mlp_gcn_highway_mix --ID=compare --dataset=pubmed
+
+python main.py main --model=mlp_gcn_highway_mix --ID=compare --dataset=cora
+```
+
+* 5、可能原因：
+
+```
+可能还是由于数据集自身的分布情况造成的。如果数据集中既有特征丰富的节点也有特征稀疏的节点，那么可能这个网络模型中的门控函数能够学习到这种潜在规律；如果数据集没有这样的分布特点，网络模型可能在学习过程中会出现懒惰学习甚至不学习的倾向。
+```
